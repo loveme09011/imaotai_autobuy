@@ -29,16 +29,16 @@ def _schedule_travel(config_path: str) -> None:
     logger.info("明日旅行任务已调度: {}", travel_time)
 
 
-def setup(config_path: str, item_code: str, city_code: str) -> None:
+def setup(config_path: str, item_codes: list[str], city_code: str) -> None:
     """注册所有定时任务。"""
     # 每天 09:00:00 执行申购
     schedule.every().day.at("09:00:00").do(
         reservation_job,
         config_path=config_path,
-        item_code=item_code,
+        item_codes=item_codes,
         city_code=city_code,
     ).tag("reservation")
-    logger.info("申购任务已注册: 每天 09:00:00")
+    logger.info("申购任务已注册: 每天 09:00:00, 商品: {}", item_codes)
 
     # 每天随机时间执行旅行
     travel_time = _random_travel_time()
@@ -48,9 +48,9 @@ def setup(config_path: str, item_code: str, city_code: str) -> None:
     logger.info("旅行任务已注册: 今日 {}", travel_time)
 
 
-def start(config_path: str, item_code: str, city_code: str) -> None:
+def start(config_path: str, item_codes: list[str], city_code: str) -> None:
     """启动调度主循环。"""
-    setup(config_path, item_code, city_code)
+    setup(config_path, item_codes, city_code)
     logger.info("调度器已启动，等待任务触发...")
     while True:
         schedule.run_pending()

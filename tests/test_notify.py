@@ -7,29 +7,29 @@ class TestFormatResults:
     def test_format_single_success(self):
         from core.notify import format_results
 
-        results = [{"mobile": "13800000001", "success": True, "message": "申购成功"}]
+        results = [{"mobile": "13800000001", "item_code": "10056", "success": True, "message": "申购成功"}]
         title, content = format_results(results)
 
         assert "i茅台申购结果" in title
         assert "0001" in content
         assert "成功" in content
+        assert "10056" in content
 
     def test_format_multiple_results(self):
         from core.notify import format_results
 
         results = [
-            {"mobile": "13800000001", "success": True, "message": "申购成功"},
-            {"mobile": "13800000002", "success": False, "message": "已申购过"},
+            {"mobile": "13800000001", "item_code": "10056", "success": True, "message": "申购成功"},
+            {"mobile": "13800000002", "item_code": "10016", "success": False, "message": "已申购过"},
         ]
         title, content = format_results(results)
 
-        lines = content.strip().split("\n")
+        lines = [l for l in content.strip().split("\n") if l.startswith("-")]
         assert len(lines) == 2
         assert "0001" in lines[0]
-        assert "成功" in lines[0]
+        assert "10056" in lines[0]
         assert "0002" in lines[1]
-        assert "失败" in lines[1]
-        assert "已申购过" in lines[1]
+        assert "10016" in lines[1]
 
     def test_format_empty_results(self):
         from core.notify import format_results
@@ -46,6 +46,25 @@ class TestFormatResults:
         title, content = format_results(results)
 
         assert "123" in content
+
+    def test_format_token_expired_warning(self):
+        from core.notify import format_results
+
+        results = [
+            {"mobile": "13800000001", "item_code": "10056", "success": False,
+             "message": "Token无效", "token_expired": True},
+        ]
+        title, content = format_results(results)
+
+        assert "Token 已过期" in content
+        assert "0001" in content
+
+    def test_format_no_item_code(self):
+        from core.notify import format_results
+
+        results = [{"mobile": "13800000001", "success": True, "message": "ok"}]
+        title, content = format_results(results)
+        assert "0001" in content
 
 
 class TestNotifyResults:
