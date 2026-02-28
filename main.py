@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 
 from utils.logger import setup_logger, get_logger
+from scheduler.runner import start
 
 CONFIG_PATH = Path(__file__).resolve().parent / "config" / "config.yaml"
 
@@ -25,7 +26,21 @@ def main() -> None:
 
     config = load_config()
     accounts = config.get("accounts", [])
-    log.info(f"已加载 {len(accounts)} 个账号")
+    item_code = config.get("item_code", "10056")
+    city_code = config.get("city_code", "520100")
+
+    # 打印配置摘要
+    log.info("===== 配置摘要 =====")
+    log.info("账号数量: {}", len(accounts))
+    log.info("目标商品: {}", item_code)
+    log.info("城市代码: {}", city_code)
+    log.info("===================")
+
+    start(
+        config_path=str(CONFIG_PATH),
+        item_code=item_code,
+        city_code=city_code,
+    )
 
 
 if __name__ == "__main__":
