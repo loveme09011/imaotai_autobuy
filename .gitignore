@@ -1,6 +1,8 @@
 .venv/
 config/config.yaml
 logs/
+data/
 __pycache__/
 *.pyc
 .env
+status.json

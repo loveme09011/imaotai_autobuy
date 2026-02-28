@@ -1,22 +1,28 @@
 accounts:
-  - phone: "13800000001"
+  - mobile: "13800000001"
     token: "your_token_here"
     device_id: "your_device_id"
+    user_id: "your_user_id"
     province: "贵州省"
     city: "贵阳市"
-    items:
-      - "10056"  # 飞天茅台
+    items:                    # 每个账号可配置不同商品，留空则使用全局 item_code
+      - "10056"               # 飞天茅台
+      - "10016"               # 茅台1935
 
-  - phone: "13800000002"
+  - mobile: "13800000002"
     token: "your_token_here"
     device_id: "your_device_id"
+    user_id: "your_user_id"
     province: "贵州省"
     city: "遵义市"
     items:
       - "10056"
 
+item_code: "10056"            # 全局默认商品ID，也可设置为列表: ["10056", "10016"]
+city_code: "520100"           # 全局默认城市代码
+
 settings:
-  sendkey: ''  # Server酱推送key，不填则不推送
+  sendkey: ''                 # Server酱推送key，不填则不推送
 
 schedule:
   reserve_time: "09:59:30"

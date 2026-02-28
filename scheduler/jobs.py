@@ -1,3 +1,7 @@
+import json
+from datetime import datetime
+from pathlib import Path
+
 import yaml
 
 from api.client import ApiClient
@@ -8,13 +12,39 @@ from utils.logger import get_logger
 
 logger = get_logger("scheduler.jobs")
 
+RESULTS_DIR = Path(__file__).resolve().parent.parent / "data" / "results"
 
-def reservation_job(config_path: str, item_code: str, city_code: str) -> list[dict]:
+
+def _save_results(results: list[dict]) -> None:
+    """将申购结果持久化到本地 JSON 文件（按日期归档）。"""
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    today = datetime.now().strftime("%Y-%m-%d")
+    filepath = RESULTS_DIR / f"{today}.json"
+
+    existing: list[dict] = []
+    if filepath.exists():
+        try:
+            existing = json.loads(filepath.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            existing = []
+
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "results": results,
+    }
+    existing.append(entry)
+    filepath.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
+    logger.info("申购结果已保存: {}", filepath)
+
+
+def reservation_job(config_path: str, item_codes: list[str], city_code: str) -> list[dict]:
     """申购任务：调用 core/reservation.run_all()，记录结果并推送通知。"""
     logger.info("===== 开始执行申购任务 =====")
-    results = run_all(config_path, item_code, city_code)
+    results = run_all(config_path, item_codes, city_code)
     success = sum(1 for r in results if r["success"])
     logger.info("申购任务完成: {}/{} 成功", success, len(results))
+
+    _save_results(results)
 
     try:
         with open(config_path, "r", encoding="utf-8") as f:
