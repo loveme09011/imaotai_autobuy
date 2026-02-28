@@ -8,25 +8,46 @@ import schedule
 
 
 class TestReservationJob:
+    @patch("scheduler.jobs._save_results")
     @patch("scheduler.jobs.run_all")
-    def test_calls_run_all_and_returns_results(self, mock_run_all):
+    def test_calls_run_all_and_returns_results(self, mock_run_all, mock_save):
         mock_run_all.return_value = [
             {"mobile": "138", "success": True, "message": "ok"},
         ]
         from scheduler.jobs import reservation_job
 
-        results = reservation_job("cfg.yaml", "10056", "520100")
-        mock_run_all.assert_called_once_with("cfg.yaml", "10056", "520100")
+        results = reservation_job("cfg.yaml", ["10056"], "520100")
+        mock_run_all.assert_called_once_with("cfg.yaml", ["10056"], "520100")
         assert len(results) == 1
         assert results[0]["success"] is True
 
+    @patch("scheduler.jobs._save_results")
     @patch("scheduler.jobs.run_all")
-    def test_returns_empty_when_no_accounts(self, mock_run_all):
+    def test_returns_empty_when_no_accounts(self, mock_run_all, mock_save):
         mock_run_all.return_value = []
         from scheduler.jobs import reservation_job
 
-        results = reservation_job("cfg.yaml", "10056", "520100")
+        results = reservation_job("cfg.yaml", ["10056"], "520100")
         assert results == []
+
+    @patch("scheduler.jobs._save_results")
+    @patch("scheduler.jobs.run_all")
+    def test_saves_results(self, mock_run_all, mock_save):
+        results_data = [{"mobile": "138", "success": True, "message": "ok"}]
+        mock_run_all.return_value = results_data
+        from scheduler.jobs import reservation_job
+
+        reservation_job("cfg.yaml", ["10056"], "520100")
+        mock_save.assert_called_once_with(results_data)
+
+    @patch("scheduler.jobs._save_results")
+    @patch("scheduler.jobs.run_all")
+    def test_multi_item_codes(self, mock_run_all, mock_save):
+        mock_run_all.return_value = []
+        from scheduler.jobs import reservation_job
+
+        reservation_job("cfg.yaml", ["10056", "10016"], "520100")
+        mock_run_all.assert_called_once_with("cfg.yaml", ["10056", "10016"], "520100")
 
 
 class TestTravelJob:
@@ -101,7 +122,7 @@ class TestRunner:
     def test_setup_registers_jobs(self, mock_res_job, mock_travel_job):
         from scheduler.runner import setup
 
-        setup("cfg.yaml", "10056", "520100")
+        setup("cfg.yaml", ["10056"], "520100")
 
         jobs = schedule.get_jobs()
         assert len(jobs) == 2
@@ -115,7 +136,7 @@ class TestRunner:
     def test_reservation_job_at_0900(self, mock_res_job, mock_travel_job):
         from scheduler.runner import setup
 
-        setup("cfg.yaml", "10056", "520100")
+        setup("cfg.yaml", ["10056"], "520100")
 
         res_jobs = [j for j in schedule.get_jobs() if "reservation" in j.tags]
         assert len(res_jobs) == 1
@@ -126,7 +147,7 @@ class TestRunner:
     def test_travel_job_in_range(self, mock_res_job, mock_travel_job):
         from scheduler.runner import setup
 
-        setup("cfg.yaml", "10056", "520100")
+        setup("cfg.yaml", ["10056"], "520100")
 
         travel_jobs = [j for j in schedule.get_jobs() if "travel" in j.tags]
         assert len(travel_jobs) == 1
