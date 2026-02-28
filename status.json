@@ -1,0 +1,8 @@
+{
+  "version": "v0.1.0",
+  "in_progress": false,
+  "pending_work": true,
+  "last_run": "2026-02-28T16:59:00+08:00",
+  "last_result": "success",
+  "note": "v0.1.0 基础功能完成：API客户端、申购核心逻辑、定时调度、结果通知"
+}
