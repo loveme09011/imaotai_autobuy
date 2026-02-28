@@ -1,0 +1,21 @@
+accounts:
+  - phone: "13800000001"
+    token: "your_token_here"
+    device_id: "your_device_id"
+    province: "贵州省"
+    city: "贵阳市"
+    items:
+      - "10056"  # 飞天茅台
+
+  - phone: "13800000002"
+    token: "your_token_here"
+    device_id: "your_device_id"
+    province: "贵州省"
+    city: "遵义市"
+    items:
+      - "10056"
+
+schedule:
+  reserve_time: "09:59:30"
+  retry_count: 3
+  retry_interval: 0.5
