@@ -1,5 +1,8 @@
+import yaml
+
 from api.client import ApiClient
 from core.account import load_accounts
+from core.notify import notify_results
 from core.reservation import run_all
 from utils.logger import get_logger
 
@@ -7,11 +10,19 @@ logger = get_logger("scheduler.jobs")
 
 
 def reservation_job(config_path: str, item_code: str, city_code: str) -> list[dict]:
-    """申购任务：调用 core/reservation.run_all()，记录结果。"""
+    """申购任务：调用 core/reservation.run_all()，记录结果并推送通知。"""
     logger.info("===== 开始执行申购任务 =====")
     results = run_all(config_path, item_code, city_code)
     success = sum(1 for r in results if r["success"])
     logger.info("申购任务完成: {}/{} 成功", success, len(results))
+
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+        notify_results(results, config)
+    except Exception as e:
+        logger.warning("推送通知时出错: {}", e)
+
     return results
 
 

@@ -15,6 +15,9 @@ accounts:
     items:
       - "10056"
 
+settings:
+  sendkey: ''  # Server酱推送key，不填则不推送
+
 schedule:
   reserve_time: "09:59:30"
   retry_count: 3
