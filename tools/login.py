@@ -9,8 +9,8 @@ import requests
 import yaml
 
 BASE_URL = "https://app.moutai519.com.cn"
-SEND_CODE_PATH = "/prod/ct/platformgw/moutai/appService/v2/user/send/code"
-LOGIN_PATH = "/prod/ct/platformgw/moutai/appService/v2/user/login"
+SEND_CODE_PATH = "/xhr/front/user/register/send/code"
+LOGIN_PATH = "/xhr/front/user/register/login"
 APP_VERSION = "1.7.6"
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
