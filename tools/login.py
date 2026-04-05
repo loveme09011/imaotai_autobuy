@@ -9,7 +9,7 @@ import requests
 import yaml
 
 BASE_URL = "https://app.moutai519.com.cn"
-SEND_CODE_PATH = "/xhr/front/user/register/send/code"
+SEND_CODE_PATH = "/xhr/front/user/register/vcode"
 LOGIN_PATH = "/xhr/front/user/register/login"
 APP_VERSION = "1.7.6"
 
